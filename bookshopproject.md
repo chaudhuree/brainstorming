@@ -4,16 +4,18 @@
 const mongoose = require('mongoose');
 
 // User schema
+// User schema
 const userSchema = new mongoose.Schema({
   name: { type: String, required: true },
   email: { type: String, required: true },
   password: { type: String, required: true },
-  address: { type: String },
+  address: { type: String, required: false }, // Optional address field
   phone: { type: String },
   role: { type: Number, default: 0 }, // 0: regular user, 1: admin
   profilePicture: { type: String }, // Field to store the profile picture
   // Additional fields as per your requirements
 });
+
 
 // Book schema
 const bookSchema = new mongoose.Schema({
@@ -39,14 +41,14 @@ const bookSchema = new mongoose.Schema({
 const transactionSchema = new mongoose.Schema({
   book: { type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true },
   borrower: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-  seller: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  seller: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, // logged in admin id who approved the buy
   transactionType: {
     type: String,
     enum: ['borrow', 'soldByCash', 'soldOnline'],
     required: true,
   },
   transactionDate: { type: Date, default: Date.now },
-  // Additional fields as per your requirements
+  // Additional fields as per requirements
 });
 
 // Define models
