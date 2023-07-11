@@ -31,9 +31,31 @@ const bookSchema = new mongoose.Schema({
       returnDate: { type: Date },
     },
   ],
-  quantity: { type: Number, default: 1 },
+  quantity: { type: Number, required: true },
+  quantityForSale: {
+    type: Number,
+    required: true,
+    validate: {
+      validator: function (v) {
+        return v + (this.quantityForBorrow || 0) === this.quantity;
+      },
+      message: 'The sum of quantityForSale and quantityForBorrow should be equal to quantity.',
+    },
+  },
+  quantityForBorrow: {
+    type: Number,
+    required: true,
+    validate: {
+      validator: function (v) {
+        return v + (this.quantityForSale || 0) === this.quantity;
+      },
+      message: 'The sum of quantityForSale and quantityForBorrow should be equal to quantity.',
+    },
+  },
+  soldQuantity: { type: Number, default: 0 },
   // Additional fields as per your requirements
 });
+
 
 // Borrower List Item schema
 const borrowerListItemSchema = new mongoose.Schema({
