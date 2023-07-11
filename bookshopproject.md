@@ -23,14 +23,8 @@ const bookSchema = new mongoose.Schema({
   genre: [{ type: String }],
   price: { type: Number, required: true },
   isAvailable: { type: Boolean, default: true },
-  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   borrowerList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'BorrowerListItem' }],
-  returnedList: [
-    {
-      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-      returnDate: { type: Date },
-    },
-  ],
+  returnedList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'ReturnedBook' }],
   quantity: { type: Number, required: true },
   quantityForSale: {
     type: Number,
@@ -53,8 +47,10 @@ const bookSchema = new mongoose.Schema({
     },
   },
   soldQuantity: { type: Number, default: 0 },
+  borrowedQuantity: { type: Number, default: 0 },
   // Additional fields as per your requirements
 });
+
 
 
 // Borrower List Item schema
@@ -65,6 +61,13 @@ const borrowerListItemSchema = new mongoose.Schema({
     enum: ['7d', '15d', '30d'],
     required: true,
   },
+});
+
+// Returned Book schema
+const returnedBookSchema = new mongoose.Schema({
+  book: { type: mongoose.Schema.Types.ObjectId, ref: 'Book', required: true },
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  returnDate: { type: Date, default: Date.now },
 });
 
 // Transaction schema
@@ -85,8 +88,61 @@ const transactionSchema = new mongoose.Schema({
 const User = mongoose.model('User', userSchema);
 const Book = mongoose.model('Book', bookSchema);
 const BorrowerListItem = mongoose.model('BorrowerListItem', borrowerListItemSchema);
+const ReturnedBook = mongoose.model('ReturnedBook', returnedBookSchema);
 const Transaction = mongoose.model('Transaction', transactionSchema);
 
 module.exports = { User, Book, BorrowerListItem, Transaction };
 
 ```
+
+> #### explaining book schema
+
+Book Schema:
+
+- title: String (required)
+  - Represents the title of the book.
+
+- author: String (required)
+  - Represents the author of the book.
+
+- description: String
+  - Provides a description of the book.
+
+- genre: Array of strings
+  - Represents the genre(s) of the book.
+
+- price: Number (required)
+  - Represents the price of the book.
+
+- isAvailable: Boolean (default: true)
+  - Indicates the availability status of the book.
+  - True: Book is available for borrowing/sale.
+  - False: Book is currently unavailable.
+
+- borrowerList: Array of ObjectId (ref: 'BorrowerListItem')
+  - Stores the references to BorrowerListItem documents.
+  - Represents the list of borrowers who borrowed this book.
+  - Each BorrowerListItem document contains borrower and duration details.
+
+- returnedList: Array of ObjectId (ref: 'ReturnedBook')
+  - Stores the references to ReturnedBook documents.
+  - Represents the list of returned books.
+  - Each ReturnedBook document contains book, userId, and returnDate fields.
+
+- quantity: Number (required)
+  - Represents the total quantity of this book available.
+
+- quantityForSale: Number (required)
+  - Represents the quantity of this book available for sale.
+  - The sum of quantityForSale and quantityForBorrow should be equal to quantity.
+
+- quantityForBorrow: Number (required)
+  - Represents the quantity of this book available for borrowing.
+  - The sum of quantityForSale and quantityForBorrow should be equal to quantity.
+
+- soldQuantity: Number (default: 0)
+  - Represents the total number of this book sold.
+
+- borrowedQuantity: Number (default: 0)
+  - Represents the total number of this book borrowed by people.
+
