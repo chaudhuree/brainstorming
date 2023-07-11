@@ -26,7 +26,16 @@ const bookSchema = new mongoose.Schema({
   price: { type: Number, required: true },
   isAvailable: { type: Boolean, default: true },
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
-  borrowerList: [{ type: mongoose.Schema.Types.ObjectId, ref: 'User' }],
+  borrowerList: [
+    {
+      borrower: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      duration: {
+        type: String,
+        enum: ['7d', '15d', '30d'],
+        required: true,
+      },
+    },
+  ],
   returnedList: [
     {
       userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
@@ -36,6 +45,7 @@ const bookSchema = new mongoose.Schema({
   quantity: { type: Number, default: 1 },
   // Additional fields as per your requirements
 });
+
 
 // Transaction schema
 const transactionSchema = new mongoose.Schema({
